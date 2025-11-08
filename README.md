@@ -1,20 +1,38 @@
-# SDOH ICD-9 Code Detection from Clinical Notes
+# SDoH ICD-9 Code Detection from Clinical Notes
 
-This repository contains the evaluation pipeline for detecting Social Determinants of Health (SDOH) ICD-9 V-codes from MIMIC-III clinical notes using GPT-4o-mini.
+Admission-level, multi-label prediction of Social Determinants of Health (SDoH) **ICD-9 V-codes** from **MIMIC-III** clinical notes using reasoning-capable LLMs.
+
+---
 
 ## Overview
 
-The system achieves 69.1% subset accuracy on multi-label SDOH classification, with:
-- Macro F1: 0.641
-- Micro F1: 0.851
-- Hamming Loss: 5.04%
+Using **GPT-5-mini**, this pipeline achieves:
 
-## Files
+| Metric                |   Score   |
+| :-------------------- | :-------: |
+| Exact Match (Amended) | **72.2%** |
+| Macro F1              | **66.5%** |
+| Micro F1              | **89.1%** |
 
-1. **`admission_level_evaluation_per_note.py`** - Main evaluation script that processes clinical notes and predicts SDOH codes
-2. **`sdoh_icd9_dataset.csv`** - Full curated dataset with 151 admissions
-3. **`sdoh_icd9_prompt.txt`** - Optimized prompt template for GPT-4o-mini
-4. **`evaluation_metrics.json`** - Complete evaluation metrics from our experiments
+These results show that LLMs can reliably convert unstructured EHR narratives into structured SDoH billing codes.
+
+---
+
+## Data Access (Important)
+
+* This project uses **MIMIC-III v1.4** clinical notes.
+* **Dataset is NOT included** in this repository.
+* Access requires **PhysioNet credentialing** and completion of required training. Please obtain the data directly from PhysioNet and set local paths accordingly.
+
+---
+
+## Repository Contents
+
+* `admission_level_evaluation_per_note.py` — Main evaluation script for admission-level predictions
+* `sdoh_icd9_prompt.txt` — Optimized reasoning prompt template
+* `evaluation_metrics.json` — Full experimental metrics
+
+---
 
 ## Requirements
 
@@ -22,26 +40,49 @@ The system achieves 69.1% subset accuracy on multi-label SDOH classification, wi
 pip install pandas numpy scikit-learn openai
 ```
 
+---
+
 ## Usage
 
-Set your OpenAI API key:
+Set your OpenAI API key and run the evaluator:
+
 ```bash
 export OPENAI_API_KEY='your-api-key-here'
-```
-
-Run evaluation:
-```bash
 python admission_level_evaluation_per_note.py
 ```
 
-## SDOH Categories Detected
+Outputs are written to `evaluation_metrics.json`.
 
-- V600: Homelessness
-- V602: Financial hardship
-- V604: No social support
-- V620: Unemployment
-- V625: Legal problems
-- V1541: Physical abuse history
-- V1542: Emotional abuse history
-- V6141: Family alcoholism
-- V6142: Family substance abuse
+---
+
+## SDoH V-Codes Detected
+
+|  ICD-9 | Domain              | Description                                        |
+| :----: | :------------------ | :------------------------------------------------- |
+|  V60.0 | Housing & Resources | Homelessness                                       |
+|  V60.2 | Housing & Resources | Financial hardship / inadequate material resources |
+|  V60.4 | Social Support      | No family caregiver                                |
+|  V62.0 | Employment          | Unemployment                                       |
+|  V62.5 | Legal               | Legal problems                                     |
+| V15.41 | Abuse History       | Physical/sexual abuse                              |
+| V15.42 | Abuse History       | Emotional abuse                                    |
+| V61.41 | Family History      | Family alcoholism                                  |
+
+---
+
+## Citation
+
+If you use this repository, please cite:
+
+```
+@inproceedings{khanLandesSdohIcd9Llm2025,
+  title = {Social Determinants of Health Prediction for {{ICD-9}} Code with Reasoning Models},
+  booktitle = {Proceedings of the 5th Machine Learning for Health Symposium},
+  author = {Khan, Sharim and Landes, Paul and Sun, Jimeng},
+  date = {2025-12},
+  location = {San Diego, USA},
+  abstract = {Social Determinants of Health correlate with patient outcomes but are rarely captured in structured data. Recent attention has been given to automatically extracting these markers from clinical text to supplement diagnostic systems with knowledge of patients’ social circumstances. Large language models demonstrate strong performance in identifying Social Determinants of Health labels from sentences. However, prediction in large admissions or longitudinal notes is challenging given long distance dependencies. In this paper, we explore hospital admission multi-label Social Determinants of Health ICD-9 code classification on the MIMIC-III dataset using reasoning models and traditional large language models. We exploit existing ICD-9 codes for prediction on admissions, which achieved a 89\% F1. Our contributions include our findings, missing SDoH codes in 139 admissions, and code to reproduce the results.},
+  file = {/Users/landes/opt/var/zotero/storage/L97NID2P/Khan-and-Landes-SdohIcd9Llm.pdf}
+}
+
+```
